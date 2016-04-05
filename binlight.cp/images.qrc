@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/background">
+        <file>images/light_off.jpg</file>
+        <file>images/light_on.jpg</file>
+    </qresource>
+</RCC>
