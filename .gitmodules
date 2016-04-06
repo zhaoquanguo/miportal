@@ -1,0 +1,3 @@
+[submodule "3rdparty/UpnpLan"]
+	path = 3rdparty/UpnpLan
+	url = https://github.com/jxfengzi/UpnpLan.git
