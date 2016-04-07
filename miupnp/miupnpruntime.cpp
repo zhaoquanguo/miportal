@@ -14,6 +14,8 @@ MiUpnpRuntime::MiUpnpRuntime(QObject *parent) : QObject(parent)
         return;
     };
     qDebug() << "upnp initliazed";
+    connect(this, SIGNAL(safeDeviceEvent(_UpnpDeviceSummary*, bool)),
+            this, SLOT(onSafeDeviceEvent(_UpnpDeviceSummary*, bool)));
 }
 
 MiUpnpRuntime::~MiUpnpRuntime()
@@ -106,11 +108,19 @@ void MiUpnpRuntime::__upnp_device_listener(_UpnpDeviceSummary *deviceSummary, bo
 
 void MiUpnpRuntime::onDeviceEvent(_UpnpDeviceSummary* deviceSummary, bool alive)
 {
+    _UpnpDeviceSummary* clone = new _UpnpDeviceSummary();
+    *clone = *deviceSummary;
+    emit safeDeviceEvent(clone, alive);
+}
+
+void MiUpnpRuntime::onSafeDeviceEvent(_UpnpDeviceSummary *deviceSummary, bool alive)
+{
     QString deviceId = deviceSummary->deviceId;
     if (alive) {
         UpnpDevice* innerDevice = UpnpDeviceFactory_Create(deviceSummary);
         if (!innerDevice) {
             qCritical()<<QString("fail to create device %1").arg(deviceId);
+            delete deviceSummary;
             return;
         }
         qDebug() << QString("new device %1").arg(deviceId);
@@ -121,6 +131,7 @@ void MiUpnpRuntime::onDeviceEvent(_UpnpDeviceSummary* deviceSummary, bool alive)
     else {
         emit deviceOffline(deviceId);
     }
+    delete deviceSummary;
 }
 
 void MiUpnpRuntime::startDiscover()

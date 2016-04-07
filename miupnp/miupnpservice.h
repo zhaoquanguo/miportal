@@ -29,6 +29,7 @@ private:
     void event_listener(_UpnpEvent *event);
 protected:
     _UpnpService* inner_upnp_service_ = nullptr;
+    MiUpnpDevice* device_ = nullptr;
     QString subscribeId_;
 };
 

@@ -11,16 +11,12 @@ MiUpnpService::MiUpnpService(MiUpnpDevice *device, _UpnpService* service)
     : QObject(device)
 {
     inner_upnp_service_ = service;
+    device_ = device;
 }
 
 MiUpnpDevice* MiUpnpService::device() const
 {
-    MiUpnpDevice *device = dynamic_cast<MiUpnpDevice*>(parent());
-    if (!device) {
-        qWarning("cannot dynamic cast to MiUpnpDevice from parent.");
-        return nullptr;
-    }
-    return device;
+    return device_;
 }
 
 QString MiUpnpService::getProperty(const QString& property_name)

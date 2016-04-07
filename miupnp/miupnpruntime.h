@@ -41,6 +41,10 @@ signals:
     void deviceOnline(MiUpnpDevice* device);
     void deviceOffline(QString deviceId);
 
+    void safeDeviceEvent(_UpnpDeviceSummary *deviceSummary, bool alive);
+private slots:
+    void onSafeDeviceEvent(_UpnpDeviceSummary *deviceSummary, bool alive);
+
 private:
     static void __upnp_device_listener(_UpnpDeviceSummary *deviceSummary, bool alive, void *ctx);
     void onDeviceEvent(_UpnpDeviceSummary *deviceSummary, bool alive);

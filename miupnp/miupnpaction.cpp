@@ -6,8 +6,9 @@
 #include "miupnpservice.h"
 #include "miupnpruntime.h"
 
-MiUpnpAction::MiUpnpAction(QObject *parent, _UpnpAction *inner_action) : QObject(parent)
+MiUpnpAction::MiUpnpAction(MiUpnpService *parent, _UpnpAction *inner_action) : QObject(parent)
 {
+    service_ = parent;
     inner_action_ = inner_action;
 }
 
@@ -35,12 +36,7 @@ bool MiUpnpAction::setInputPara(const QString &para_name, const bool &para_value
 
 bool MiUpnpAction::invoke()
 {
-    MiUpnpService* service = dynamic_cast<MiUpnpService*>(parent());
-    if (!service) {
-        return false;
-    }
-
-    MiUpnpDevice* device = service->device();
+    MiUpnpDevice* device = service_->device();
     if (!device) {
         return false;
     }

@@ -4,11 +4,12 @@
 #include <QObject>
 
 struct _UpnpAction;
+class MiUpnpService;
 class MiUpnpAction : public QObject
 {
     Q_OBJECT
 public:
-    explicit MiUpnpAction(QObject *parent, _UpnpAction *inner_action);
+    explicit MiUpnpAction(MiUpnpService *parent, _UpnpAction *inner_action);
 
     bool setInputPara(const QString& para_name, const bool& para_value);
 
@@ -21,6 +22,7 @@ signals:
 public slots:
 
 protected:
+    MiUpnpService* service_ = nullptr;
     _UpnpAction* inner_action_ = nullptr;
 };
 

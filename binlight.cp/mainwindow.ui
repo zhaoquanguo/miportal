@@ -45,7 +45,7 @@
    <widget class="QPushButton" name="btnDeviceRefresh">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>310</x>
       <y>10</y>
       <width>80</width>
       <height>30</height>

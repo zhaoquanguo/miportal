@@ -24,7 +24,7 @@ void MainWindow::on_btnUpnpSwitch_clicked()
     }
     if (miupnptime_->isStarted()) {
         QObject::disconnect(miupnptime_, SIGNAL(deviceOnline(MiUpnpDevice*)),
-                         this, SLOT(deviceOnline(MiUpnpDevice*)));
+                         this, SLOT(OnDeviceOnline(MiUpnpDevice*)));
 
         QObject::disconnect(miupnptime_, SIGNAL(deviceOffline(QString)),
                                  this, SLOT(OnDeviceOffline(QString)));
@@ -34,7 +34,7 @@ void MainWindow::on_btnUpnpSwitch_clicked()
     }
     else{
         QObject::connect(miupnptime_, SIGNAL(deviceOnline(MiUpnpDevice*)),
-                         this, SLOT(deviceOnline(MiUpnpDevice*)));
+                         this, SLOT(OnDeviceOnline(MiUpnpDevice*)));
 
         QObject::connect(miupnptime_, SIGNAL(deviceOffline(QString)),
                                  this, SLOT(OnDeviceOffline(QString)));
@@ -63,9 +63,14 @@ void MainWindow::on_binLight_clicked()
 void MainWindow::OnDeviceOnline(MiUpnpDevice* device)
 {
     BinaryLightStub* binaryLightStub = new BinaryLightStub(this, device);
+    if (!binaryLightStub->init()) {
+        qWarning() << "fail to init binary light";
+        return;
+    }
     QString id = binaryLightStub->deviceId();
     qDebug() << "a binary light online :" <<id;
     binaryLights_.insert(id, binaryLightStub);
+    current_ids_.push_back(id);
     showLight(-1);
 }
 
@@ -98,7 +103,7 @@ void MainWindow::on_btnNext_clicked()
 void MainWindow::showLight(int index)
 {
     int max_index = binaryLights_.size();
-    if (max_index == 0) {
+    if (max_index == 0 || current_ids_.empty()) {
         curent_id_index_ = -1;
         ui->btnNext->setVisible(false);
         ui->btnPre->setVisible(false);

@@ -1,8 +1,6 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-03-31T17:44:34
-#
-#-------------------------------------------------
+!include( ../miportral.pri ) {
+    error( "Couldn't find the miportral.pri file!" )
+}
 
 QT       -= gui
 
@@ -10,12 +8,7 @@ TARGET = miupnp
 TEMPLATE = lib
 CONFIG += staticlib
 
-SOLUTION_ROOT = $$PWD/..
-
-INCLUDEPATH += $$SOLUTION_ROOT/3rdparty/upnp/include
-LIBS += -L$$SOLUTION_ROOT/3rdparty/upnp/lib -lupnp
-
-SOURCES += miupnp.cpp \
+SOURCES += \
     miupnpruntime.cpp \
     miupnpdevice.cpp \
     miupnpservice.cpp \
@@ -29,9 +22,23 @@ HEADERS += miupnp.h\
     miupnpevent.h \
     miupnpaction.h
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
+INCLUDEPATH += ../3rdparty/upnp/include
+
+OTHER_FILES = ../3rdparty/upnp/bin/upnp.dll
+OTHER_FILES += ../3rdparty/upnp/bin/expat.dll
+
+# Copy the dynamic library.
+win32 {
+    DESTDIR_WIN = $${DESTDIR}
+    DESTDIR_WIN ~= s,/,\\,g
+    for(FILE, OTHER_FILES){
+        message($$FILE)
+        FILE ~= s,/,\\,g
+        QMAKE_PRE_LINK += $$quote(cmd /c copy /y $${FILE} $${DESTDIR_WIN}$$escape_expand(\\n\\t))
+    }
 }
+
+
+
 
 
