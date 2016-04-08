@@ -12,10 +12,11 @@ class MiUpnpDevice : public QObject
 public:
     MiUpnpDevice(MiUpnpRuntime *runtime, _UpnpDevice *device);
     ~MiUpnpDevice();
+
     _UpnpDevice* innerDevice();
+
     QString id() const;
     QString friendlyName() const;
-    QString getProperty(const QString& propertyName);
 
     MiUpnpService* getService(QString serviceId);
 

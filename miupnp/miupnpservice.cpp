@@ -3,8 +3,8 @@
 #include "miupnpruntime.h"
 #include "miupnpaction.h"
 #include "miupnpevent.h"
+#include "Upnp.h"
 
-#include <Upnp.h>
 #include <QDebug>
 
 MiUpnpService::MiUpnpService(MiUpnpDevice *device, _UpnpService* service)
@@ -17,13 +17,6 @@ MiUpnpService::MiUpnpService(MiUpnpDevice *device, _UpnpService* service)
 MiUpnpDevice* MiUpnpService::device() const
 {
     return device_;
-}
-
-QString MiUpnpService::getProperty(const QString& property_name)
-{
-   QString property_value =  UpnpService_GetPropertyValue(
-               inner_upnp_service_, property_name.toLocal8Bit().constData());
-   return property_value;
 }
 
 void MiUpnpService::__event_listener(_UpnpEvent *event, void *ctx)
@@ -43,49 +36,43 @@ void MiUpnpService::event_listener(_UpnpEvent *event)
 bool MiUpnpService::subscribe()
 {
     qDebug() << "to subcribe event.";
-    _UpnpSubscription sub = { 0 };
-    sub.service = inner_upnp_service_;
-    sub.listener = __event_listener;
-    sub.ctx = this;
-    sub.timeout = 0;
-    MiUpnpDevice *device = this->device();
-    bool ok = device->runtime()->subscribe(&sub);
-    if (!ok) {
-        qCritical() << "Fail to subcribe event";
+    _UpnpRuntime* inner_runtime = device_->runtime()->innerRuntime();
+
+    UpnpError upnp_error = { 0 };
+
+    TinyRet ret = UpnpRuntime_Subscribe(
+                inner_runtime,
+                inner_upnp_service_,
+                0,
+                __event_listener,
+                this,
+                &upnp_error);
+    if (RET_FAILED(ret)) {
+        qCritical() << "Fail to subcribe event : " << ret << " msg:" << upnp_error.description;
         return false;
     }
-    subscribeId_ = sub.subscribeId;
-    qDebug() <<"subcribed with id:" << subscribeId_;
     return true;
 }
 
 void MiUpnpService::unsubscribe()
 {
-    qDebug() << "to unsubcribe event :" << subscribeId_;
-    _UpnpSubscription sub = { 0 };
-    sub.service = inner_upnp_service_;
-    strncpy(sub.subscribeId, subscribeId_.toLocal8Bit().constData(), UPNP_UUID_LEN);
-    sub.ctx = this;
-    MiUpnpDevice *device = this->device();
-    bool ok = device->runtime()->unsubscribe(&sub);
-    if (!ok) {
-        qCritical() << "Fail to unsubcribe event";
-        return;
+    qDebug() << "to unsubcribe event :";
+    _UpnpRuntime* inner_runtime = device_->runtime()->innerRuntime();
+
+    UpnpError upnp_error = { 0 };
+
+    TinyRet ret = UpnpRuntime_Unsubscribe(
+                inner_runtime,
+                inner_upnp_service_,
+                &upnp_error);
+    if (RET_FAILED(ret)) {
+        qCritical() << "Fail to unsubcribe event : " << ret << " msg:" << upnp_error.description;
     }
-    subscribeId_.clear();
-    qDebug() << "success unsubcribe.";
-    return;
 }
 
 MiUpnpAction* MiUpnpService::getAction(const QString& name)
 {
-    UpnpActionList *actionlist = UpnpService_GetActionList(inner_upnp_service_);
-    if (!actionlist) {
-        qCritical() << "invalid actionlist";
-        return nullptr;
-    }
-
-    UpnpAction *action = UpnpActionList_GetAction(actionlist, name.toLocal8Bit().constData());
+    UpnpAction *action = UpnpService_GetAction(inner_upnp_service_, name.toLocal8Bit().constData());
     if (!action) {
         qDebug() << "invalid action: " << name;
         return nullptr;

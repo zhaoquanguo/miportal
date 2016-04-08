@@ -17,6 +17,7 @@ public:
 
     bool getResult(const QString& field_name, bool& value);
 
+    QString GetArgumentRelatedStateVariable(const QString& argumentName);
 signals:
 
 public slots:

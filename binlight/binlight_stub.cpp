@@ -9,7 +9,7 @@ BinaryLightStub::BinaryLightStub(QObject* parent, MiUpnpDevice* upnp_device)
 
 BinaryLightStub::~BinaryLightStub()
 {
-    uninit();
+    //uninit();
     switch_power_service_ = NULL;
 }
 
@@ -35,7 +35,6 @@ bool BinaryLightStub::init()
         qCritical() << "Service not found:" << ID_SwitchPower;
         return false;
     }
-
 
 
     qDebug() << "to subcribe event.";

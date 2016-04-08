@@ -1,7 +1,6 @@
 #include "miupnpaction.h"
-#include <Upnp.h>
+#include "Upnp.h"
 #include <QDebug>
-#include <QMetaType>
 #include "miupnpdevice.h"
 #include "miupnpservice.h"
 #include "miupnpruntime.h"
@@ -12,24 +11,24 @@ MiUpnpAction::MiUpnpAction(MiUpnpService *parent, _UpnpAction *inner_action) : Q
     inner_action_ = inner_action;
 }
 
+QString MiUpnpAction::GetArgumentRelatedStateVariable(const QString& argumentName)
+{
+    const char* var = UpnpAction_GetArgumentRelatedStateVariable(
+                inner_action_, argumentName.toLocal8Bit().constData());
+    return QString(var);
+}
+
 bool MiUpnpAction::setInputPara(const QString &para_name, const bool &para_value)
 {
-    if (!inner_action_) {
-        qWarning() << "inner action is null";
-        return false;
-    }
-
-    /**
-    * Argument IN (1)
-    */
-    PropertyList *_in = UpnpAction_GetArgumentList(inner_action_);
-    Property *_newTargetValue = PropertyList_GetProperty(_in, para_name.toLocal8Bit().constData());
+    UpnpStateVariable * _newTargetValue = UpnpService_GetStateVariable(
+                service_->inner_upnp_service_,
+                UpnpAction_GetArgumentRelatedStateVariable(inner_action_, para_name.toLocal8Bit().constData()));
     if (!_newTargetValue) {
-        qWarning("Result invalid: %s NOT FOUND!", para_name.constData());
+        qCritical() << "action para not found:" << para_name;
         return false;
     }
 
-    _newTargetValue->value.object.value.boolValue = para_value;
+    _newTargetValue->value.internalValue.boolValue = para_value;
 
     return true;
 }
@@ -40,7 +39,6 @@ bool MiUpnpAction::invoke()
     if (!device) {
         return false;
     }
-
     MiUpnpRuntime* runtime = device->runtime();
     if (!device) {
         return false;
@@ -66,14 +64,15 @@ bool MiUpnpAction::getResult(const QString& field_name, bool& value)
     /**
     * Argument OUT
     */
-    PropertyList *_out = UpnpAction_GetResultList(inner_action_);
-    Property *_ResultStatus = PropertyList_GetProperty(_out, field_name.toLocal8Bit().constData());
-    if (_ResultStatus == NULL) {
-        qDebug() << "Result invalid: NOT FOUND!";
+    UpnpStateVariable * _ResultStatus = UpnpService_GetStateVariable(
+                service_->inner_upnp_service_,
+                UpnpAction_GetArgumentRelatedStateVariable(inner_action_, field_name.toLocal8Bit().constData()));
+    if (!_ResultStatus) {
+        qCritical() << "action para not found:" << field_name;
         return false;
     }
 
-    value = _ResultStatus->value.object.value.boolValue;
+    value = _ResultStatus->value.internalValue.boolValue;
 
     return true;
 }

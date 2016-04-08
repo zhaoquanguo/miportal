@@ -24,6 +24,5 @@ LIBS += -L$$DESTDIR
 LIBS += -lmiupnp -lbinlight
 
 #
-LIBS += -L../3rdparty/upnp/lib
 LIBS += -lupnp
 

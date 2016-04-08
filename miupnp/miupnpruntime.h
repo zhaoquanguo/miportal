@@ -6,7 +6,6 @@
 
 struct _UpnpRuntime;
 struct _UpnpDeviceSummary;
-struct _UpnpSubscription;
 struct _UpnpUri;
 
 class MiUpnpDevice;
@@ -49,8 +48,7 @@ private:
     static void __upnp_device_listener(_UpnpDeviceSummary *deviceSummary, bool alive, void *ctx);
     void onDeviceEvent(_UpnpDeviceSummary *deviceSummary, bool alive);
 
-    bool subscribe(_UpnpSubscription *subscription);
-    bool unsubscribe(_UpnpSubscription *subscription);
+    _UpnpRuntime* innerRuntime() const;
 private:
     bool is_started_ = false;
     _UpnpRuntime *upnp_runtime_ = nullptr;

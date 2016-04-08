@@ -183,24 +183,8 @@ bool MiUpnpRuntime::isStarted() const
    return is_started_;
 }
 
-bool MiUpnpRuntime::subscribe(_UpnpSubscription *subscription)
+_UpnpRuntime* MiUpnpRuntime::innerRuntime() const
 {
-    UpnpError upnp_error;
-    int ret = UpnpRuntime_Subscribe(upnp_runtime_, subscription, &upnp_error);
-    if (RET_FAILED(ret)) {
-        qDebug() << "Fail to subcribe event status:" << ret;
-        return false;
-    }
-    return true;
+    return upnp_runtime_;
 }
 
-bool MiUpnpRuntime::unsubscribe(_UpnpSubscription *subscription)
-{
-    UpnpError upnp_error;
-    int ret = UpnpRuntime_Unsubscribe(upnp_runtime_, subscription, &upnp_error);
-    if (RET_FAILED(ret)) {
-        qDebug() << "Fail to unsubcribe event status:" << ret;
-        return false;
-    }
-    return true;
-}

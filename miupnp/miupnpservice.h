@@ -10,6 +10,7 @@ struct _UpnpEvent;
 
 class MiUpnpService: public QObject
 {
+    friend class MiUpnpAction;
     Q_OBJECT
 public:
     MiUpnpService(MiUpnpDevice *device, _UpnpService* service);
@@ -30,7 +31,6 @@ private:
 protected:
     _UpnpService* inner_upnp_service_ = nullptr;
     MiUpnpDevice* device_ = nullptr;
-    QString subscribeId_;
 };
 
 #endif // MIUPNPSERVICE_H

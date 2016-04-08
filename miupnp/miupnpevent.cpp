@@ -11,6 +11,7 @@ QString MiUpnpEvent::GetArgumentValue(const QString& argument)
 {
     const char * value = UpnpEvent_GetArgumentValue(event_, argument.toLocal8Bit().constData());
     if (value != NULL) {
+        qDebug() << "event " << argument << ":" << value;
         return value;
     }
     else {
